@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hello <%= name %></h1>
+    <h2>admin inventory: </h2>
+    <table>
+        <tr>
+            <th>productName</th>
+            <th>quantity</th>
+        </tr>
+        <% adminData.forEach((data) => { %>
+        <tr>
+            <td><%= data.productName %></td>
+            <td><%= data.quantity %></td>
+            
+        </tr>
+        <% })%>
+    </table>
+
+    <h2>your inventory: </h2>
+    <table>
+        <tr>
+            <th>productName</th>
+            <th>quantity</th>
+        </tr>
+        <% userData.forEach((data) => { %>
+        <tr>
+            <td><%= data.productName %></td>
+            <td><%= data.quantity %></td>
+            
+        </tr>
+        <% })%>
+    </table>
+    request:
+    <!-- 
+    meminta produk ke admin, nanti admin dapat notif dan bisa accept atau tidak
+    susah: kalau accept, maka otomatis produk dipindahkan sesuai demand ;
+    simple: dpt request, dan manual transfer
+    -->
+</body>
+</html>

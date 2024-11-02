@@ -1,75 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
-</head>
-<body >
-    <h1>Admin</h1>
-    
-    <table>
-        users
-        <tr>
-            <th>name</th>
-            <th>email</th>
-        </tr>
-        <%userData.forEach((data) => { %>
-        <tr>
-            <td><%= data.name %></td>
-            <td><%= data.email %></td>
-        </tr>
-        
-        <% })%>
-    </table>
+<%- include('../views/Layout/header') %>
+
+    <body>
+        <h1>Admin</h1>
+        <h3>users data</h3>
+        <table class="table table-bordered">
+
+            <tr>
+                <th>name</th>
+                <th>email</th>
+            </tr>
+            <%userData.forEach((data)=> { %>
+                <tr>
+                    <td>
+                        <%= data.name %>
+                    </td>
+                    <td>
+                        <%= data.email %>
+                    </td>
+                </tr>
+
+                <% })%>
+        </table>
 
 
-    <h2>admin inventory: </h2>
-    <table>
-        <tr>
-            <th>productName</th>
-            <th>quantity</th>
-        </tr>
-        <% adminInventoryData.forEach((data) => { %>
-        <tr>
-            <td><%= data.productName %></td>
-            <td><%= data.quantity %></td>
-            
-        </tr>
-        <% })%>
-    </table>
-        <form action="/add_product" method="POST">
-            <label for="productName">productName:</label>
-            <input type="text" id="productName" name="productName" required>
-            <label for="quantity">quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-            <button type="submit">add</button>
-        </form>
-        <form action="/delete_product" method="POST">
-            <label for="productName">productName:</label>
-            <input type="text" id="productName" name="productName" required>
-            <label for="quantity">quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-            <button type="submit">delete</button>
-        </form>
-        <form action="/move_product" method="POST">
-            <label for="productName">productName:</label>
-            <input type="text" id="productName" name="productName" required>
-            <label for="quantity">quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-            <label for="name">receiverName</label>
-            <input type="text" id="receiverName" name="receiverName" required>
-            <button type="submit">move</button>
-        </form>
-        <form action="/take_product" method="POST">
-            <label for="productName">productName:</label>
-            <input type="text" id="productName" name="productName" required>
-            <label for="quantity">quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-            <label for="name">name</label>
-            <input type="text" id="name" name="name" required>
-            <button type="submit">take</button>
-        </form>
-    
-</body>
-</html>
+        <h2>admin inventory: </h2>
+        <table class="table table-bordered">
+            <tr>
+                <th>productName</th>
+                <th>quantity</th>
+            </tr>
+            <% adminInventoryData.forEach((data)=> { %>
+                <tr>
+                    <td>
+                        <%= data.productName %>
+                    </td>
+                    <td>
+                        <%= data.quantity %>
+                    </td>
+
+                </tr>
+                <% })%>
+        </table>
+        <table class="table table-bordered" style="width: 300px;">
+            <td>
+                <form action="/add_product" method="POST">
+                    <label for="productName">productName:</label>
+                    <input type="text" id="productName" name="productName" required>
+                    <label for="quantity">quantity:</label>
+                    <input type="number" id="quantity" name="quantity" required>
+                    <button type="submit">add</button>
+                </form>
+            </td>
+            <td>
+                <form action="/delete_product" method="POST">
+                    <label for="productName">productName:</label>
+                    <input type="text" id="productName" name="productName" required>
+                    <label for="quantity">quantity:</label>
+                    <input type="number" id="quantity" name="quantity" required>
+                    <button type="submit">delete</button>
+                </form>
+            </td>
+            <td>
+            <form action="/move_product" method="POST">
+                <label for="productName">productName:</label>
+                <input type="text" id="productName" name="productName" required>
+                <label for="quantity">quantity:</label>
+                <input type="number" id="quantity" name="quantity" required>
+                <label for="name">receiverName</label>
+                <input type="text" id="receiverName" name="receiverName" required>
+                <button type="submit">move</button>
+            </form>
+        </td>
+        <td>
+            <form action="/take_product" method="POST">
+                <label for="productName">productName:</label>
+                <input type="text" id="productName" name="productName" required>
+                <label for="quantity">quantity:</label>
+                <input type="number" id="quantity" name="quantity" required>
+                <label for="name">name</label>
+                <input type="text" id="name" name="name" required>
+                <button type="submit">take</button>
+            </form>
+        </td>
+        </table>
+    </body>
+    <%- include('../views/Layout/footer') %>

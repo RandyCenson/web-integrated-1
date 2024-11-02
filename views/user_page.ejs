@@ -1,46 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Hello <%= name %></h1>
-    <h2>admin inventory: </h2>
-    <table>
-        <tr>
-            <th>productName</th>
-            <th>quantity</th>
-        </tr>
-        <% adminData.forEach((data) => { %>
-        <tr>
-            <td><%= data.productName %></td>
-            <td><%= data.quantity %></td>
-            
-        </tr>
-        <% })%>
-    </table>
+<%- include('../views/Layout/header') %>
 
-    <h2>your inventory: </h2>
-    <table>
-        <tr>
-            <th>productName</th>
-            <th>quantity</th>
-        </tr>
-        <% userData.forEach((data) => { %>
-        <tr>
-            <td><%= data.productName %></td>
-            <td><%= data.quantity %></td>
-            
-        </tr>
-        <% })%>
-    </table>
-    request:
-    <!-- 
-    meminta produk ke admin, nanti admin dapat notif dan bisa accept atau tidak
-    susah: kalau accept, maka otomatis produk dipindahkan sesuai demand ;
-    simple: dpt request, dan manual transfer
-    -->
-</body>
-</html>
+    <body>
+        <h1>Hello <%= name %>
+        </h1>
+        <h2>admin inventory: </h2>
+        <table class="table table-bordered">
+            <tr>
+                <th>productName</th>
+                <th>quantity</th>
+            </tr>
+            <% adminData.forEach((data)=> { %>
+                <tr>
+                    <td>
+                        <%= data.productName %>
+                    </td>
+                    <td>
+                        <%= data.quantity %>
+                    </td>
+
+                </tr>
+                <% })%>
+        </table>
+
+        <h2>your inventory: </h2>
+        <table class="table table-bordered">
+            <tr>
+                <th>productName</th>
+                <th>quantity</th>
+            </tr>
+            <% userData.forEach((data)=> { %>
+                <tr>
+                    <td>
+                        <%= data.productName %>
+                    </td>
+                    <td>
+                        <%= data.quantity %>
+                    </td>
+
+                </tr>
+                <% })%>
+        </table>
+        <h3>request:</h3>
+        <table class="table table-bordered" style="width: 50%">
+
+            <form action="/request" method="POST">
+                <td>
+                    <label for="name">name: </label>
+                    <input type="text" name="name" id="name" value="<%= name %>" readonly><br>
+                </td>
+                <td>
+                    <label for="productName">productName:</label>
+                    <input type="text" id="productName" name="productName">
+                </td>
+                <td>
+                    <label for="quantity">quantity:</label>
+                    <input type="number" id="quantity" name="quantity"><br>
+                </td>
+                <td>
+                    <label for="description">description: </label>
+                    <input type="text" id="description" name="description" style="height: 30px;"><br>
+                </td>
+
+
+        </table>
+        
+            <input type="radio" id="add" name="request" value="add">
+            <label for="request">add</label>
+            <input type="radio" id="remove" name="request" value="remove">
+            <label for="manual">remove</label>
+            <input type="radio" class="form-check-input" id="remove" name="request" value="change">
+            <label for="manual">change</label>
+        
+        <input type="submit" value="Submit">
+        </form>
+
+
+
+    </body>
+    <%- include('../views/Layout/footer') %>

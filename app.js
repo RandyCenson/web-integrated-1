@@ -344,10 +344,29 @@ app.post('/take_product', async (req, res) => {
     }
 });
 
-app.use('/',(req, res) => {
-    res.status(404);
-    res.send('404-page not found');
+app.post('/request', async(req, res) => {
+    const dataInput = {
+        name: req.body.name,
+        productName: req.body.productName,
+        quantity: req.body.quantity,
+        description: req.body.description,
+        request: req.body.request
+    }
+    const collectionName = `${dataInput.name}`;
+    const docRef = db.collection('users_inventory').doc(collectionName).collection('request');
+    const adminInventoryData = (await db.collection('Admin_inventory').get()).docs.map((doc) => doc.data());
+    const userInventoryData = (await db.collection('users_inventory').doc(collectionName).collection('product').get()).docs.map((doc) => doc.data());
+
+    docRef.doc().set(dataInput).then(() => {
+        res.status(200).render('user_page', { name: dataInput.name, adminData: adminInventoryData, userData: userInventoryData });
+    });
+
 })
+
+// app.use('/',(req, res) => {
+//     res.status(404);
+//     res.send('404-page not found');
+// })
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

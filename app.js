@@ -79,14 +79,26 @@ app.post('/submitToAddUser',async (req, res) => {
     const saltRounds = 10;
     try {
         const docRef = await db.collection('users');
+
         const hashedPassword = await bcrypt.hash(passwordInput, saltRounds);
         docRef.add({
-        email: emailInput,
-        name: nameInput,
-        password: hashedPassword
+            email: emailInput,
+            name: nameInput,
+            password: hashedPassword
+        });
+        const productData ={
+            productName: 'default',
+            quantity: 0,
+        };
+        const docRef2 = await db.collection('users_inventory').doc(`${nameInput}`).collection('product').add(productData);
+        // const docRef2 = await db.collection('users_inventory').doc(`${nameInput}`).collection('product');
+        //working
+        // await docRef2.set({
+        //     productName: '',
+        //     quantity: 0});
+        // console.log('new doc detected');
 
-    });
-    res.render('login');
+        res.render('login');
     } catch (e) {
     console.error("Error adding document: ", e);
     }
@@ -105,15 +117,13 @@ app.post('/submitToLogin',async (req, res) => {
         res.status(401).json({ message: 'email not found' });
     }
     try {
-        const snapshotAdmin = await db.collection('Admin_inventory').get(); // Replace with your collection name
+        const snapshotAdmin = await db.collection('Admin_inventory').get();
         const adminData = snapshotAdmin.docs.map((doc) => doc.data());
 
-        const collectionName = `${user.docs[0].data().name}_inventory`;
-        const snapshotUser = await db.collection(collectionName).get(); // Replace with your collection name
+        const collectionName = `${user.docs[0].data().name}`;
+        const snapshotUser = await db.collection('users_inventory').doc(collectionName).collection('product').get();
         const userData = snapshotUser.docs.map((doc) => doc.data());
         if (user) {
-            //check if password matches
-            // console.log(user.docs[0].data().password);
             const isPasswordMatch = await bcrypt.compare(passwordInput, user.docs[0].data().password);
             if (!isPasswordMatch) {
                 res.status(401).json({ message: 'Password salah' });
@@ -214,7 +224,7 @@ app.post('/delete_product', async (req, res) => {
         console.error("Error updating product:", err);
         res.status(500).json({ message: 'An error occurred while updating the product' });
     }
-})
+});
 
 app.post('/move_product', async (req, res) => { 
     const data = {
@@ -243,17 +253,17 @@ app.post('/move_product', async (req, res) => {
         }
 
         // Define the receiver's inventory collection
-        const collectionName = `${data.receiverName}_inventory`;
+        const collectionName = `${data.receiverName}`;
         
         // Check if the product already exists in the receiver's inventory
-        let receiverData = await db.collection(collectionName)
+        let receiverData = await db.collection('users_inventory').doc(collectionName).collection('product')
             .where('productName', '==', data.productNameInput)
             .get();
         
         if (receiverData.empty) {
             // If the product doesn't exist in the receiver's inventory, create a new document
             console.log('Receiver product not found, creating new product entry');
-            await db.collection(collectionName).add({
+            await db.collection('users_inventory').doc(collectionName).collection('product').add({
                 productName: data.productNameInput,
                 quantity: data.quantityInput
             });
@@ -301,10 +311,10 @@ app.post('/take_product', async (req, res) => {
         const newAdminData = currAdminValue + data.quantityInput;
 
         // Define the receiver's inventory collection
-        const collectionName = `${data.nameInput}_inventory`;
+        const collectionName = `${data.nameInput}`;
         console.log(3);
         // Check if the product already exists in the receiver's inventory
-        let userData = await db.collection(collectionName)
+        let userData = await db.collection('users_inventory').doc(collectionName).collection('product')
             .where('productName', '==', data.productNameInput)
             .get();
             console.log(4);

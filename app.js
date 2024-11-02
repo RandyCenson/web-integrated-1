@@ -29,7 +29,7 @@ const serviceAccount = {
 };
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),  
+    credential: admin.credential.cert(serviceAccount),
 });
 
 
@@ -71,11 +71,11 @@ app.get('/login', (req, res) => {
 })
 
 
-app.post('/submitToAddUser',async (req, res) => {
+app.post('/submitToAddUser', async (req, res) => {
     const emailInput = req.body.email;
     const passwordInput = req.body.password;
     const nameInput = req.body.name;
-    
+
     const saltRounds = 10;
     try {
         const docRef = await db.collection('users');
@@ -86,7 +86,7 @@ app.post('/submitToAddUser',async (req, res) => {
             name: nameInput,
             password: hashedPassword
         });
-        const productData ={
+        const productData = {
             productName: 'default',
             quantity: 0,
         };
@@ -100,18 +100,18 @@ app.post('/submitToAddUser',async (req, res) => {
 
         res.render('login');
     } catch (e) {
-    console.error("Error adding document: ", e);
+        console.error("Error adding document: ", e);
     }
     //alert
-    
+
 })
 
-app.post('/submitToLogin',async (req, res) => {
+app.post('/submitToLogin', async (req, res) => {
     const emailInput = req.body.email;
     const usersCollection = db.collection('users');
     const passwordInput = req.body.password;
     const user = await usersCollection.where('email', '==', emailInput).get();
-    
+
 
     if (!user) {
         res.status(401).json({ message: 'email not found' });
@@ -129,7 +129,7 @@ app.post('/submitToLogin',async (req, res) => {
                 res.status(401).json({ message: 'Password salah' });
             } else {
                 currUserName = user.docs[0].data().name;
-                res.status(200).render('user_page', { name: user.docs[0].data().name , adminData: adminData, userData: userData });
+                res.status(200).render('user_page', { name: user.docs[0].data().name, adminData: adminData, userData: userData });
             }
         }
         else if (req.body.email === "") {
@@ -139,26 +139,26 @@ app.post('/submitToLogin',async (req, res) => {
             res.status(401).json({ message: 'email not found' });
         }
     } catch (e) {
-    console.error("Error login", e);
+        console.error("Error login", e);
     }
-    
+
 })
 
-app.get('/admin', async(req, res) => {
+app.get('/admin', async (req, res) => {
     try {
         const snapshotUser = await db.collection('users').get(); // Replace with your collection name
         const snapshotAdminInventory = await db.collection('Admin_inventory').get(); // Replace with your collection name
         const userData = snapshotUser.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Map through documents
         const adminInventoryData = snapshotAdminInventory.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        //ribet ambil semua data inventory user karena user terbagi dengan collection berbeda (susah increment collections)
-        //future update buat data users inventory menjadi 1 collection
+        const userReqData = (await db.collection('users_request').get()).docs.map((doc) => doc.data());
 
-        res.render('adminDashboard', { userData: userData, adminInventoryData: adminInventoryData }); // Pass data to the EJS template
+        // res.json({ userData: userData, adminInventoryData: adminInventoryData, userReqData: userReqData });
+        res.render('adminDashboard', { userData: userData, adminInventoryData: adminInventoryData, userReqData: userReqData }); // Pass data to the EJS template
     } catch (err) {
         console.error("Error fetching data:", err);
     }
-})
-app.post('/add_product', async (req, res) => {   
+});
+app.post('/add_product', async (req, res) => {
     const data = {
         productName: req.body.productName,
         quantity: parseInt(req.body.quantity),
@@ -170,7 +170,7 @@ app.post('/add_product', async (req, res) => {
         const productAvailability = await db.collection(collectionName)
             .where('productName', '==', data.productName)
             .get();
-        
+
         if (!productAvailability.empty) {
             // Product with the same name exists, update its quantity
             console.log('Product already exists');
@@ -195,10 +195,10 @@ app.post('/add_product', async (req, res) => {
 
 
 
-app.post('/delete_product', async (req, res) => { 
+app.post('/delete_product', async (req, res) => {
     const data = {
         productNameInput: req.body.productName,
-        quantityInput: parseInt(req.body.quantity), 
+        quantityInput: parseInt(req.body.quantity),
     };
 
     try {
@@ -218,7 +218,7 @@ app.post('/delete_product', async (req, res) => {
 
         await docRef.update({ quantity: newData });
         // res.status(200).json({ message: 'Product quantity updated successfully' });
-        res.redirect('/admin');  
+        res.redirect('/admin');
 
     } catch (err) {
         console.error("Error updating product:", err);
@@ -226,10 +226,10 @@ app.post('/delete_product', async (req, res) => {
     }
 });
 
-app.post('/move_product', async (req, res) => { 
+app.post('/move_product', async (req, res) => {
     const data = {
         productNameInput: req.body.productName,
-        quantityInput: parseInt(req.body.quantity), 
+        quantityInput: parseInt(req.body.quantity),
         receiverName: req.body.receiverName
     };
 
@@ -254,12 +254,12 @@ app.post('/move_product', async (req, res) => {
 
         // Define the receiver's inventory collection
         const collectionName = `${data.receiverName}`;
-        
+
         // Check if the product already exists in the receiver's inventory
         let receiverData = await db.collection('users_inventory').doc(collectionName).collection('product')
             .where('productName', '==', data.productNameInput)
             .get();
-        
+
         if (receiverData.empty) {
             // If the product doesn't exist in the receiver's inventory, create a new document
             console.log('Receiver product not found, creating new product entry');
@@ -280,7 +280,7 @@ app.post('/move_product', async (req, res) => {
         await docRef.update({ quantity: newData });
 
         // Redirect or send a success response
-        res.redirect('/admin');  
+        res.redirect('/admin');
 
     } catch (err) {
         console.error("Error moving product:", err);
@@ -288,10 +288,10 @@ app.post('/move_product', async (req, res) => {
     }
 });
 
-app.post('/take_product', async (req, res) => { 
+app.post('/take_product', async (req, res) => {
     const data = {
         productNameInput: req.body.productName,
-        quantityInput: parseInt(req.body.quantity), 
+        quantityInput: parseInt(req.body.quantity),
         nameInput: req.body.name
     };
 
@@ -317,7 +317,7 @@ app.post('/take_product', async (req, res) => {
         let userData = await db.collection('users_inventory').doc(collectionName).collection('product')
             .where('productName', '==', data.productNameInput)
             .get();
-            console.log(4);
+        console.log(4);
         if (userData.empty) {
             // If the product doesn't exist in the receiver's inventory, create a new document
             return res.status(444).json({ message: 'Product not found in user inventory' });
@@ -336,7 +336,7 @@ app.post('/take_product', async (req, res) => {
         await AdmindocRef.update({ quantity: newAdminData });
 
         // Redirect or send a success response
-        res.redirect('/admin');  
+        res.redirect('/admin');
 
     } catch (err) {
         console.error("Error moving product:", err);
@@ -344,7 +344,7 @@ app.post('/take_product', async (req, res) => {
     }
 });
 
-app.post('/request', async(req, res) => {
+app.post('/request', async (req, res) => {
     const dataInput = {
         name: req.body.name,
         productName: req.body.productName,
@@ -353,14 +353,22 @@ app.post('/request', async(req, res) => {
         request: req.body.request
     }
     const collectionName = `${dataInput.name}`;
-    const docRef = db.collection('users_inventory').doc(collectionName).collection('request');
+    const docRef = db.collection('users_request');
     const adminInventoryData = (await db.collection('Admin_inventory').get()).docs.map((doc) => doc.data());
     const userInventoryData = (await db.collection('users_inventory').doc(collectionName).collection('product').get()).docs.map((doc) => doc.data());
 
     docRef.doc().set(dataInput).then(() => {
         res.status(200).render('user_page', { name: dataInput.name, adminData: adminInventoryData, userData: userInventoryData });
     });
+});
 
+app.post('/accept_request', (req, res) => {
+    
+    res.redirect('/admin');
+})
+
+app.post('/reject_request', (req, res) => {
+    res.redirect('/admin');
 })
 
 // app.use('/',(req, res) => {
